@@ -7,7 +7,10 @@ import ProfileContent from "./ProfileContent";
 
 export default function ProfilePage() {
   const { id } = useParams();
-  const { profile, isLoadingProfile } = useProfile(id);
+  const { profile, isLoadingProfile, isCurrentUser, followUser } =
+    useProfile(id);
+
+  const handleFollowUser = () => followUser(profile?.id as string);
 
   if (isLoadingProfile) return <Typography>Loading...</Typography>;
 
@@ -16,7 +19,11 @@ export default function ProfilePage() {
   return (
     <Grid2 container>
       <Grid2 size={12}>
-        <ProfileHeader profile={profile} />
+        <ProfileHeader
+          profile={profile}
+          isCurrentUser={isCurrentUser}
+          handleFollowUser={handleFollowUser}
+        />
         <ProfileContent />
       </Grid2>
     </Grid2>

@@ -61,9 +61,54 @@ export const useProfile = (id?: string) => {
       });
       return { prevPhotos };
     },
+    onError: (_, id, context) => {
+      if (context) {
+        queryClient.setQueryData(
+          PROFILE_QUERY_KEY.photos(user?.id),
+          context.prevPhotos
+        );
+      }
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: PROFILE_QUERY_KEY.photos(user?.id),
+      });
+    },
+  });
+
+  const { mutateAsync: followUser, isPending: isFollowingUser } = useMutation({
+    mutationFn: async (id: string) => {
+      await agent.post(`/profiles/${id}/follow`);
+    },
+    onMutate: async (id: string) => {
+      const key = PROFILE_QUERY_KEY.profile(id);
+      await queryClient.cancelQueries({ queryKey: key });
+      const prevProfile = queryClient.getQueryData<Profile>(key);
+      console.log("🚀 ~ useProfile ~ prevProfile:", prevProfile);
+
+      queryClient.setQueryData(key, (prev: Profile) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          following: !prev.following,
+          followersCount: prev.following
+            ? prev.followersCount - 1
+            : prev.followersCount + 1,
+        };
+      });
+      return { prevProfile };
+    },
+    onError: (_, id, context) => {
+      if (context) {
+        queryClient.setQueryData(
+          PROFILE_QUERY_KEY.profile(id),
+          context.prevProfile
+        );
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: PROFILE_QUERY_KEY.profile(id),
       });
     },
   });
@@ -153,5 +198,7 @@ export const useProfile = (id?: string) => {
     isSettingMainPhoto,
     deletePhoto,
     isDeletingPhoto,
+    followUser,
+    isFollowingUser,
   };
 };

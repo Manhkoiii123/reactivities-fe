@@ -1,6 +1,6 @@
 import { useActivities } from "@/libs/hooks/useActivities";
 import { formatDate } from "@/libs/utils/format-date";
-import { Card, Badge, CardMedia, Box, Typography, Button } from "@mui/material";
+import { Card, Badge, CardMedia, Box, Typography } from "@mui/material";
 import { Link } from "react-router";
 import StyledButton from "@/shared/components/StyledButton";
 
@@ -60,7 +60,7 @@ export default function ActivityDetailsHeader({ activity }: Props) {
           <Typography variant="subtitle2">
             Hosted by{" "}
             <Link
-              to={`/profiles/username`}
+              to={`/profiles/${activity.host.id}`}
               style={{ color: "white", fontWeight: "bold" }}
             >
               {activity.host.displayName}
